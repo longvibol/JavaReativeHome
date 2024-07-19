@@ -1,0 +1,165 @@
+- Week 2: Flux Emit ( emit the item to subscriber no stop) 
+
+- Flux - Create / Generate / Push ( we create on and customize our publisher )
+
++ Create : Control loop 
++ Generate : loop generate with Thread safe 
++ Push : Control Loop without Thread safe
+
+
+1. FluxSink is the Thread Safe : so we can use FluxSink to emait the thread for each iteam 
+
+public class FluxCreateRefactoring {
+
+	public static void main(String[] args) {
+
+		NameProducer nameProducer = new NameProducer();
+		
+		Flux.create(nameProducer).subscribe(Util.subcriber());		
+		nameProducer.produce();		
+		// we call the : nameProducer at outside; we can serpeate the method and custome at outside 
+		
+		// Runnable runnable = () -> nameProducer.produce(); 
+		
+		Runnable runnable = nameProducer::produce;
+		
+		for(int i = 0; i <10; i++) {
+			new Thread(runnable).start();
+		}
+		
+	}
+
+----------------
+
+public class NameProducer implements Consumer<FluxSink<String>>{
+	
+	private FluxSink<String> fluxSink;
+
+	@Override
+	public void accept(FluxSink<String> stringFluxSink) {
+
+		this.fluxSink = stringFluxSink;
+		
+	}
+	
+	public void produce() {
+		String name = Util.faker().name().fullName();
+		String thread = Thread.currentThread().getName();
+		this.fluxSink.next(thread + " : " +name);
+	}
+
+}
+
+
+-------------------- 
+
+flux operator : Map, filter, Take … 
+
+Example : take 
+
+} while (!country.toLowerCase().equals("cambodia") && !fluxSink.isCancelled());
+			
+		})
+		.take(3)
+
+
+បើយើងអត់ដាក់ !fluxSink.isCancelled() : Publisher will email until it will meet the condition 
+but the subscriber only want 3 iteam, that why we need to fix it by putting : fluxSink.isCancelled()
+អោយពេលវាជួយ cancel it will cancel the up stream . 
+
+--------------------------
+
+Diference Between Flux.create and Flux.generate 
+
+- Creat ( we control the loop how many time we want to emit to subscriber) = FluxSink 
+ 
+- generate (it emit data to the subscriber) = SynchronuseSink or Sink  (it mostly use with Take() operator 
+and it emit only one iteam for the generate
+
+Ex: Sink.complete(); it will cancel the up stream 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,279 @@
+Week 3: Operator 
+
+1. handle = filter + map
+
+Ex: 
+Flux.range(1, 10)
+			.handle((interger, sink)->{
+				if(interger %2 == 0)
+					sink.next(interger); // filter 
+				else
+					sink.next(interger+" : Odd Number"); // map 
+			})
+			.subscribe(Util.subcriber())
+			;
+
+Ex2 : 
+
+Flux.generate(synchronousSink -> synchronousSink.next(Util.faker().country().name()))
+			.map(Objects::toString)
+			.handle((s, sink)->{
+				sink.next(s);
+				
+				if(s.toLowerCase().equals("canada"))
+					sink.complete();
+				
+			}).subscribe(Util.subcriber());
+
+-------------------------
+
+2. Call back Operators = after we get the pipe line we can use the call back function 
+
+1. .doFirst(() -> System.out.println("Do first"))
+
+do from from d->u
+
+2. .doOnDiscard(Object.class, t -> System.out.println("request : " +t))
+វាធ្វើពេលដែល Upstream item not emit the iteam to the down stream 
+
+3. .doFinally(t -> System.out.println("do oncancel : " +t))
+
+We need to put doonfinally at the end! to complete the work 
+
+4. .limitRate(0) ធ្វើការលើ request upstream 75% then it is like pagenation 
+
+5. .delayElements(Duration.ofSeconds(3)) = it delay request to upstream for the request time 3 second 
+mean during 3 second it will request to upstream not whole from Publisher 
+
+6. .onErrorReturn() : when error we give it the return 
+
+------------------- Error handle : fall back function : ***** Resilent handle ***********
+
+public static void main(String[] args) {
+		
+		Flux.range(1, 10)
+			.log()
+			.map(i -> 10/(5-i))
+//			.onErrorReturn(20)
+			.onErrorResume(e ->fallBack())		
+			.subscribe(Util.subcriber());		
+
+	}
+	
+	private static Mono<Integer> fallBack(){
+		return Mono.fromSupplier(()->Util.faker().random().nextInt(100, 200));
+	}
+
+}
+
+ពេលដែលមាន status error na moy happened we use Error to handle
+
+
+----------------------------------------------------------------------
+
+1. Operator : timeout(Duration.ofseconds(2), fallback())
+During 2 second if nothing provide to the subscriber it will call the fallback function 
+Example in request DB if something not happened please give me another option 
+
+
+----------------
+
+2. DefaultIfmplty 
+
+.defaultfEmpty(-100) 
+
+Example: 
+
+public static void main(String[] args) {
+		
+		Flux.range(1, 10)
+			.filter(i -> i>10)				
+			.defaultIfEmpty(100)
+			.subscribe(Util.subcriber());		
+
+	}
+==> 
+
+Recieved: 100
+Completed
+
+-------------------------- 
+
+
+3. .switchIfEmpty(Publiser) 
+
+if something is Empty it will swtich to another result 
+
+- Request to redis cached it it is Emtly please switch to fallback() function 
+
+Example: 
+
+Flux.range(1, 10)
+			.filter(i -> i>10)
+			.switchIfEmpty(fallBack())
+			.subscribe(Util.subcriber());	
+
+----------------------
+
+*** Transform Operator *** 
+
+
+Use when we want to combine the same workflow together 
+
+Example: 
+
+public class TranformOperatorService {
+	
+	public static void main(String[] args) {
+		
+		getPerson().transform(applyFilterFuntionMap()).subscribe(Util.subcriber());
+
+	}
+
+	public static Flux<Person> getPerson() {
+		return Flux.range(1, 10).map(i -> new Person());
+	}
+
+	// we want age > 10 and name is capital letter ==> we create function<accept 1
+	// input , then return output>
+	// Function is use for Tranform the Object
+
+	public static Function<Flux<Person>, Flux<Person>> applyFilterFuntionMap() {
+		return flux -> flux.filter(p -> p.getAge() > 10).doOnNext(t -> t.setName(t.getName().toUpperCase()))
+				.doOnDiscard(Person.class, p -> System.out.println(" Not allowing : " + p));
+
+	}
+
+}
+
+--------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

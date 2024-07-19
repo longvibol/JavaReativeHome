@@ -1,0 +1,114 @@
+Flux Note
+
+1. Flux.fromIterable = Flux.Just it both use when we already have data 
+Example: 
+
+List<String> strings = Arrays.asList("a","b","c");
+
+Flux.fromIterable(strings).subscribe; 
+
+2. Flux.Array 
+
+Integer[] arr = {1,2,3,4};
+Flux.fromArray(arr).subscribe;
+
+3. from Stream we can not use more than one time but we can create supplier to create list of Stream in Flux
+
+Exam:
+
+Flux<Integer> integerFlux = Flux.fromStream( () -> list.stream());
+
+4. Flux.rang(1,10) = loop from 1 to 10 iteam 
+
+*5: Subscription ( the object Subscription is the middle object to handle the work betweek Subscriber and Flux)
+
+Flux -> Subscriber -> Request -> Subscription -> Flux 
+
+Ex: we use Flux.range(1, 20)
+			.log()
+			.subscribeWith(new Subscriber<Integer>() 
+
+==> to customize our subscription flow
+
+
+We need to respect the specification of the Reactive : 
+
+When it invoke the Cancel method or Error it will stop working 
+
+OnNext: 7
+[ INFO] (main) | cancel()
+
+------------------------------
+
+Push Some Update every Time from Flux. way to create publiser
+
+1. Flux.interval(Duration.ofSeconds(1))
+	.subscribe(Util.onNext());
+
+Util.sleepSeconds(5)
+
+==> Every 1 second it will emit the one item to the subscriber by Onnext Method 
+
+--------------------------------------------
+
+
+2.Flux.from ( we create flux from Mono ) = way to create publisher 
+
+3. Convert from Flux to Mono 
+
+Flux.rang(1,10).next().subscribe();
+- next() method it will return one item then will complete!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
